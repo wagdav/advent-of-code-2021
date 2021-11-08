@@ -9,17 +9,9 @@ Install the Nix package manager then
 nix build
 ```
 
-Then run the solutions
-
-```
-./result/bin/day01
-./result/bin/day02
-...
-./result/bin/day25
-```
-
 # Develop
 
+Run all tests:
 ```
-nix develop --command cargo {build,clippy,fmt,watch}
+nix develop --command clj -X:test
 ```

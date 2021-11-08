@@ -4,8 +4,3 @@
 (defn example []
   (println "Day 01")
   42)
-
-(deftest test-example
-  (is (= (example) 42)))
-
-(run-tests)
