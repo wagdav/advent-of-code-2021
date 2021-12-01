@@ -101,48 +101,41 @@ hcl:#cfa07d eyr:2025 pid:166559648
 iyr:2011 ecl:brn hgt:59in")
 
 
+(defn parse-entry
+  [entry]
+  (->> (re-seq #"(\w{3}):(\S+)" entry)
+       (mapcat next)
+       (apply hash-map)))
+
 (defn parse-passports [input]
-  (->> (str/split input #"\n\n")
-       (map #(str/split % #"[\n ]"))
-      (map parse-passport)))
-
-(defn parse-passport [passport]
-  (->> passport
-    (mapcat #(str/split % #":"))
-    (apply hash-map)
-    clojure.walk/keywordize-keys
-    parse-values))
-
-(defn parse-year [s] (Integer/parseInt s))
-
-(defn parse-height
-  [s]
-  (let [[_ value unit] (re-find #"(\d+)(cm|in)" s)]
-    {:value (Integer/parseInt value)
-     :unit unit}))
-
-(defn parse-values
-  [passport]
-  (let [{:keys [byr iyr eyr hgt]} passport]
-    (cond-> passport
-        byr (update :byr parse-year)
-        iyr (update :iyr parse-year)
-        eyr (update :eyr parse-year)
-        hgt (update :hgt parse-height))))
+  (map parse-entry (str/split input #"\R\R")))
 
 (defn valid? [passport]
-  (not-any? nil? ((juxt :byr :iyr :eyr :hgt :hcl :ecl :pid ) passport)))
+  (= 7 (count (dissoc passport :cid))))
 
-(defn valid2? [passport]
-  (and
-    (valid? passport)
-    (<= 1920 (:byr passport) 2002)
-    (<= 2010 (:iyr passport) 2020)
-    (<= 2020 (:eyr passport) 2030)))
+(defn valid2? [{:keys [byr iyr eyr hgt hcl ecl pid]}]
+  (boolean
+    (and
+      byr (<= 1920 (Integer/parseInt byr) 2002)
+      iyr (<= 2010 (Integer/parseInt iyr) 2020)
+      eyr (<= 2020 (Integer/parseInt eyr) 2030)
+      hgt (let [[_ value unit] (re-find #"(\d+)(cm|in)" hgt)]
+            (case unit
+              "cm" (<= 150 (Integer/parseInt value) 193)
+              "in" (<= 59 (Integer/parseInt value) 76)
+              false))
+      hcl (re-find #"^#[0-9a-f]{6}$" hcl)
+      ecl (#{"amb" "blu" "brn" "gry" "grn" "hzl" "oth"} ecl)
+      pid (re-find #"^\d{9}$" pid))))
 
 
-(valid2? {:pid "087499704" :hgt "74in" :ecl "grn" :iyr 2012 :eyr 2030 :byr 1980 :hcl "#623a2f"})
+(valid2? {:pid "087499704"
+          :hgt "74in"
+          :ecl "grn"
+          :iyr "2012"
+          :eyr "2030"
+          :byr "1980"
+          :hcl "#623a2f"})
 
 (let [example (parse-passports passports)]
-  (= 2 (count (filter valid? example)))
-  (filter valid? example))
+  (count (filter valid? example)))
