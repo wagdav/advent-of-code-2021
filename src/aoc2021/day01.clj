@@ -19,11 +19,3 @@
   (->> (partition 3 1 input)
        (map #(apply + %))
        solve-part1))
-
-(= 7 (solve-part1 example-input))
-(= 5 (solve-part2 example-input))
-
-(def input (parse-input "day01.txt"))
-
-(solve-part1 input)
-(solve-part2 input)

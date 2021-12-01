@@ -15,3 +15,9 @@ Run all tests:
 ```
 nix develop --command clj -X:test
 ```
+
+Run linting:
+
+```
+nix develop --command clj-kondo --lint .
+```
