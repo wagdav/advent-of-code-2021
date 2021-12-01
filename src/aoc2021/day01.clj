@@ -8,7 +8,7 @@
   (->> (io/resource input-file)
        slurp
        str/split-lines
-       (mapv #(Integer/parseInt %))))
+       (mapv read-string)))
 
 (defn solve-part1 [input]
   (->> (partition 2 1 input)
