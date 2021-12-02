@@ -20,37 +20,36 @@ forward 2")
        (mapv #(str/split % #" "))
        (mapv (fn [[d v]] [d (read-string v)]))))
 
+
+(defn compute-result [{:keys [pos depth]}]
+  (* pos depth))
+
 (defn solve-part1 [input]
   (->> input
-    (reduce
-      (fn [acc [command, amount]]
-        (case command
-          "forward" (update acc :pos + amount)
-          "down" (update acc :depth + amount)
-          "up" (update acc :depth - amount)))
-      {:pos 0 :depth 0})
-    vals
-    (reduce *)))
+       (reduce
+         (fn [state [command amount]]
+           (case command
+             "forward" (update state :pos + amount)
+             "down" (update state :depth + amount)
+             "up" (update state :depth - amount)))
+         {:pos 0 :depth 0})
+       compute-result))
 
 (defn solve-part2 [input]
-  (reduce *
-    (vals
-      (dissoc
-        (->> input
-          (reduce
-            (fn [acc [command, amount]]
-              (case command
-                "down" (update acc :aim + amount)
-                "up" (update acc :aim - amount)
-                "forward" (assoc acc :pos (+ amount (:pos acc))
-                                     :depth (+ (:depth acc) (* (:aim acc) amount)))))
-            {:pos 0 :depth 0 :aim 0}))
-        :aim))))
+  (->> input
+       (reduce
+         (fn [{:keys [pos depth aim] :as state} [command amount]]
+           (case command
+             "down" (update state :aim + amount)
+             "up" (update state :aim - amount)
+             "forward" (assoc state :pos (+ amount pos)
+                                    :depth (+ depth (* aim amount)))))
+         {:pos 0 :depth 0 :aim 0})
+       compute-result))
 
-(solve-part1 (parse-input-file "day02.txt"))
 
 (solve-part1 (parse-input example-input))
-
 (solve-part2 (parse-input example-input))
 
+(solve-part1 (parse-input-file "day02.txt"))
 (solve-part2 (parse-input-file "day02.txt"))
