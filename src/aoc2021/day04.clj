@@ -1,6 +1,7 @@
 (ns aoc2021.day04
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.set :as set]))
 
 (def example "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
@@ -34,5 +35,35 @@
            (str/split-lines board-lines)))
        (rest blocks))}))
 
+(defn transpose [m]
+  (apply mapv vector m))
+
+(defn wins? [board marked]
+  "The board wins if it has at least one complete row or column of marked numbers"
+  (let [all-marked? (fn [nums] (set/subset? nums (set marked)))]
+    (or
+      (some all-marked? board)
+      (some all-marked? (transpose board)))))
+
+(defn score
+  "Sum of all the unmarked numbers"
+  [board marked]
+  (->> (flatten board)
+       (remove (set marked))
+       (reduce +)))
+
+(defn solve-part1 [{:keys [numbers boards]}]
+  (reduce
+    (fn [marked n]
+     (let [winning-board (some #((when (wins? % marked) %)) boards)]
+       (if winning-board
+         (reduced (* (first marked) (score winning-board marked)))
+         (conj marked n))))
+    ()
+    numbers))
+
 (def example-input (parse-input example))
 (def real-input (parse-input (slurp (io/resource "day04.txt"))))
+
+(solve-part1 example-input)
+(solve-part1 real-input)
