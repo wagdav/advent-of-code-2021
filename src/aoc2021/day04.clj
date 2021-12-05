@@ -1,7 +1,6 @@
 (ns aoc2021.day04
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]
-            [clojure.set :as set]))
+            [clojure.string :as str]))
 
 (def example "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
@@ -41,46 +40,67 @@
 (defn wins?
   "The board wins if it has at least one complete row or column of marked numbers"
  [board marked]
- (let [all-marked? (fn [nums] (set/subset? nums (set marked)))]
-   (or
-     (some all-marked? board)
-     (some all-marked? (transpose board)))))
+ (let [all-marked? (fn [nums] (every? (set marked) nums))]
+   (if (or
+         (some all-marked? board)
+         (some all-marked? (transpose board)))
+     board
+     nil)))
 
 (defn score
-  "Sum of all the unmarked numbers"
+  "Sum of all the unmarked numbers multiplied by the last drawn number"
   [board marked]
-  (->> (flatten board)
-       (remove (set marked))
-       (reduce +)))
+  (*
+    (->> (flatten board)
+         (remove (set marked))
+         (reduce +))
+    (first marked)))
+
+(= 4512 (score (nth (example-input :boards) 2)
+               '(24 21 14 0 2 23 17 11 5 9 4 7)))
 
 (defn solve-part1 [{:keys [numbers boards]}]
   (reduce
     (fn [marked n]
-     (let [winning-board (some (fn [b] (when (wins? b marked) b)) boards)]
+     (let [numbers (conj marked n)
+           winning-board (some #(wins? % numbers) boards)]
        (if winning-board
-         (reduced (* (first marked) (score winning-board marked)))
-         (conj marked n))))
+         (reduced (score winning-board numbers))
+         numbers)))
     ()
     numbers))
 
-(defn solve-part2 [{:keys [numbers boards]}]
-  (:winning-boards
-    (reduce
-      (fn [{:keys [marked winning-boards in-play] :as state} n]
-       (let [winning-board (some (fn [b] (when (wins? b marked) b)) in-play)]
-         (if winning-board
-           (assoc state :marked (conj marked n)
-                        :winning-boards (conj winning-boards (* (first marked) (score winning-board marked)))
-                        :in-play (disj in-play winning-board))
-           (assoc state :marked (conj marked n)))))
-      {:marked '() :winning-boards '() :in-play (set boards)}
-      numbers)))
+(defn game [{:keys [numbers boards]}]
+  (reductions
+    (fn [{:keys [drawn winners in-play scores] :as state} n]
+       (let [nums   (conj drawn n)
+             winner (first (keep #(wins? % nums) in-play))]
+         (cond-> state
+           true   (assoc :drawn nums)
+           winner (assoc
+                    :scores (conj scores (score winner nums))
+                    :in-play (disj in-play winner)
+                    :winner-count (keep #(wins? % nums) in-play)))))
+    {:drawn '()
+     :in-play (set boards)
+     :scores '()}
+    numbers))
 
-(def example-input (parse-input example))
-(def real-input (parse-input (slurp (io/resource "day04.txt"))))
+(defn solve-part2 [input]
+  (first (:scores (game input))))
 
-(solve-part1 example-input)
-(solve-part2 example-input)
+(comment
+  (game example-input)
 
-(solve-part1 real-input)
-(solve-part2 real-input)
+  (game real-input)
+
+  (solve-part2 example-input)
+  (solve-part2 real-input)
+
+  (def example-input (parse-input example))
+  (def real-input (parse-input (slurp (io/resource "day04.txt"))))
+
+  (= 4512 (solve-part1 example-input))
+
+  (= 31424 (solve-part1 real-input))
+  (= 23042 (solve-part2 real-input)))
