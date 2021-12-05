@@ -38,12 +38,13 @@
 (defn transpose [m]
   (apply mapv vector m))
 
-(defn wins? [board marked]
+(defn wins?
   "The board wins if it has at least one complete row or column of marked numbers"
-  (let [all-marked? (fn [nums] (set/subset? nums (set marked)))]
-    (or
-      (some all-marked? board)
-      (some all-marked? (transpose board)))))
+ [board marked]
+ (let [all-marked? (fn [nums] (set/subset? nums (set marked)))]
+   (or
+     (some all-marked? board)
+     (some all-marked? (transpose board)))))
 
 (defn score
   "Sum of all the unmarked numbers"

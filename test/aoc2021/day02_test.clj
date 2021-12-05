@@ -1,14 +1,15 @@
 (ns aoc2021.day02-test
   (:require [clojure.test :refer [deftest is testing]]
-            [aoc2021.day01 :refer [example-input parse-input solve-part1 solve-part2]]))
+            [aoc2021.day02 :refer [example parse-input solve-part1 solve-part2]]
+            [clojure.java.io :as io]))
 
 (deftest works
   (testing "with example input"
-    (is (= 7 (solve-part1 example-input)))
-    (is (= 5 (solve-part2 example-input))))
+    (let [input (parse-input example)]
+      (is (= 150 (solve-part1 input)))
+      (is (= 900 (solve-part2 input)))))
 
   (testing "with real input"
-    (let [input (parse-input "day02.txt")]
-      (is (= 1233 (solve-part1 input)))
-      (is (= 1275 (solve-part2 input))))))
-
+    (let [input (parse-input (slurp (io/resource "day02.txt")))]
+      (is (= 1693300 (solve-part1 input)))
+      (is (= 1857958050 (solve-part2 input))))))
