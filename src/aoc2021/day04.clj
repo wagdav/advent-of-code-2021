@@ -55,15 +55,31 @@
 (defn solve-part1 [{:keys [numbers boards]}]
   (reduce
     (fn [marked n]
-     (let [winning-board (some #((when (wins? % marked) %)) boards)]
+     (let [winning-board (some (fn [b] (when (wins? b marked) b)) boards)]
        (if winning-board
          (reduced (* (first marked) (score winning-board marked)))
          (conj marked n))))
     ()
     numbers))
 
+(defn solve-part2 [{:keys [numbers boards]}]
+  (:winning-boards
+    (reduce
+      (fn [{:keys [marked winning-boards in-play] :as state} n]
+       (let [winning-board (some (fn [b] (when (wins? b marked) b)) in-play)]
+         (if winning-board
+           (assoc state :marked (conj marked n)
+                        :winning-boards (conj winning-boards (* (first marked) (score winning-board marked)))
+                        :in-play (disj in-play winning-board))
+           (assoc state :marked (conj marked n)))))
+      {:marked '() :winning-boards '() :in-play (set boards)}
+      numbers)))
+
 (def example-input (parse-input example))
 (def real-input (parse-input (slurp (io/resource "day04.txt"))))
 
 (solve-part1 example-input)
+(solve-part2 example-input)
+
 (solve-part1 real-input)
+(solve-part2 real-input)
