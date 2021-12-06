@@ -1,5 +1,5 @@
 My solutions to the programming puzzles in the [Advent of Code
-2021](adventofcode.com/) written in Clojure.
+2021](https://adventofcode.com/2021) written in Clojure.
 
 # Build and run
 
