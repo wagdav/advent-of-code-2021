@@ -68,14 +68,12 @@
 
 (defn game [{:keys [numbers boards]}]
   (reduce
-    (fn [{:keys [drawn in-play scores] :as state} n]
+    (fn [{:keys [drawn in-play scores]} n]
        (let [nums    (conj drawn n)
              winners (keep #(wins? % nums) in-play)]
-         (cond-> state
-           true          (assoc :drawn nums)
-           (seq winners) (assoc
-                          :scores (into scores (map #(score % nums) winners))
-                          :in-play (remove (set winners) in-play)))))
+         {:drawn nums
+          :scores (into scores (map #(score % nums) winners))
+          :in-play (remove (set winners) in-play)}))
     {:drawn '()
      :in-play boards
      :scores '()}
