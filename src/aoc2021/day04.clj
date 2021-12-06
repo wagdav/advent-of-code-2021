@@ -1,6 +1,5 @@
 (ns aoc2021.day04
-  (:require [clojure.java.io :as io]
-            [clojure.string :as str]))
+  (:require [clojure.string :as str]))
 
 (def example "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1
 
@@ -56,9 +55,6 @@
          (reduce +))
     (first marked)))
 
-(= 4512 (score (nth (example-input :boards) 2)
-               '(24 21 14 0 2 23 17 11 5 9 4 7)))
-
 (defn solve-part1 [{:keys [numbers boards]}]
   (reduce
     (fn [marked n]
@@ -71,36 +67,19 @@
     numbers))
 
 (defn game [{:keys [numbers boards]}]
-  (reductions
-    (fn [{:keys [drawn winners in-play scores] :as state} n]
-       (let [nums   (conj drawn n)
-             winner (first (keep #(wins? % nums) in-play))]
+  (reduce
+    (fn [{:keys [drawn in-play scores] :as state} n]
+       (let [nums    (conj drawn n)
+             winners (keep #(wins? % nums) in-play)]
          (cond-> state
-           true   (assoc :drawn nums)
-           winner (assoc
-                    :scores (conj scores (score winner nums))
-                    :in-play (disj in-play winner)
-                    :winner-count (keep #(wins? % nums) in-play)))))
+           true          (assoc :drawn nums)
+           (seq winners) (assoc
+                          :scores (into scores (map #(score % nums) winners))
+                          :in-play (remove (set winners) in-play)))))
     {:drawn '()
-     :in-play (set boards)
+     :in-play boards
      :scores '()}
     numbers))
 
 (defn solve-part2 [input]
   (first (:scores (game input))))
-
-(comment
-  (game example-input)
-
-  (game real-input)
-
-  (solve-part2 example-input)
-  (solve-part2 real-input)
-
-  (def example-input (parse-input example))
-  (def real-input (parse-input (slurp (io/resource "day04.txt"))))
-
-  (= 4512 (solve-part1 example-input))
-
-  (= 31424 (solve-part1 real-input))
-  (= 23042 (solve-part2 real-input)))
