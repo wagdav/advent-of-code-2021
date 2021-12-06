@@ -7,9 +7,6 @@
        (re-seq #"\d+")
        (map read-string)))
 
-
-(->> (parse-input example-input))
-
 (defn solve-part1 [input]
    (loop [f input
           t 80]
@@ -23,16 +20,9 @@
           t    n]
      (if (= t 0)
         (reduce + (vals fish))
-        (recur (-> fish
-                   (assoc 0 (get fish 1 0)
-                          1 (get fish 2 0)
-                          2 (get fish 3 0)
-                          3 (get fish 4 0)
-                          4 (get fish 5 0)
-                          5 (get fish 6 0)
-                          6 (get fish 7 0)
-                          7 (get fish 8 0)
-                          8 (get fish 0 0))
+        (recur (-> (into {} (for [i (range 9)]
+                                 [i
+                                  (get fish (mod (inc i) 9) 0)]))
                    (update 6 + (get fish 0 0)))
                (dec t)))))
 
