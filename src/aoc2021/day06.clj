@@ -19,7 +19,7 @@
    (loop [fish (frequencies input)
           t    n]
      (if (= t 0)
-        (reduce + (vals fish))
+        (apply + (vals fish))
         (recur (-> (into {} (for [i (range 9)]
                                  [i
                                   (get fish (mod (inc i) 9) 0)]))
@@ -47,7 +47,7 @@
       state))
 
   ; The final aggregation function.
-  (defn fish-count [st] (reduce + (vals st)))
+  (defn fish-count [st] (apply + (vals st)))
 
   ; This decoupling allows to ask different questions.  For example, see the
   ; first few days:

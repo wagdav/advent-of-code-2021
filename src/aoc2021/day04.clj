@@ -52,7 +52,7 @@
   (*
     (->> (flatten board)
          (remove (set marked))
-         (reduce +))
+         (apply +))
     (first marked)))
 
 (defn solve-part1 [{:keys [numbers boards]}]

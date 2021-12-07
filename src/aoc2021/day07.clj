@@ -12,10 +12,10 @@
 (defn distance1 [x y] (abs (- x y)))
 
 (defn distance2 [x y]
-  (reduce + (range 1 (inc (distance1 x y)))))
+  (apply + (range 1 (inc (distance1 x y)))))
 
 (defn cost [d positions target]
-  (reduce + (map #(d % target) positions)))
+  (apply + (map #(d % target) positions)))
 
 (defn optimize [input cost-fun]
   (let [minpos (apply min input)
