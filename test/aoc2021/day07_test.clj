@@ -7,7 +7,7 @@
   (testing "with example input"
     (let [input (parse-input example-input)]
       (is (= 37 (solve-part1 input)))
-      (is (= 170 (solve-part2 input))))) ; is this wrong? should be 168?
+      (is (= 168 (solve-part2 input)))))
 
   (testing "with real input"
     (let [input (parse-input (slurp (io/resource "day07.txt")))]

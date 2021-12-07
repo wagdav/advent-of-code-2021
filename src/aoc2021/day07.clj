@@ -9,22 +9,24 @@
 
 (defn abs [n] (max n (- n)))
 
-(defn distance [x y] (abs (- x y)))
+(defn distance1 [x y] (abs (- x y)))
 
 (defn distance2 [x y]
-  (reduce + (range 1 (inc (distance x y)))))
+  (reduce + (range 1 (inc (distance1 x y)))))
 
-(defn cost [distance positions target]
-  (reduce + (map #(distance % target) positions)))
+(defn cost [d positions target]
+  (reduce + (map #(d % target) positions)))
+
+(defn optimize [input cost-fun]
+  (let [minpos (apply min input)
+        maxpos (apply max input)]
+    (apply min
+      (map
+        cost-fun
+        (range minpos (inc maxpos))))))
 
 (defn solve-part1 [input]
-  (apply min
-    (map
-      #(cost distance input %)
-      input)))
+  (optimize input #(cost distance1 input %)))
 
 (defn solve-part2 [input]
-  (apply min
-    (map
-      #(cost distance2 input %)
-      input)))
+  (optimize input #(cost distance2 input %)))
