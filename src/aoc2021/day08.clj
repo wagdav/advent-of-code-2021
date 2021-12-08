@@ -48,12 +48,15 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 
 (defn decode [patterns]
   (let [group  (group-by count patterns)
+        ; Unambiguous digits
         one    (first (get group 2))
         four   (first (get group 4))
         seven  (first (get group 3))
         eight  (first (get group 7))
+        ; Candiates for 2,3,5 and 0,6,9
         c235   (get group 5)
         c069   (get group 6)
+        ; Find the rest by exploiting their similarities in shape
         three  (find-with-mask one c235)
         nine   (find-with-mask three c069)
         zero   (->> c069
