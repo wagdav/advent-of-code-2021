@@ -1,6 +1,5 @@
 (ns aoc2021.day09
-  (:require [clojure.string :as str]
-            [clojure.set :as set]))
+  (:require [clojure.string :as str]))
 
 (def example-input "2199943210
 3987894921
@@ -13,29 +12,26 @@
        (mapv #(re-seq #"\w" %))
        (mapv #(mapv read-string %))))
 
-(defn adjacent-coords [[x y]]
-  [[x y] [x (dec y)] [x (inc y)] [(dec x) y] [(inc x) y]])
+(defn neigbours [[x y] rows]
+  (let [xmax (-> rows count dec)
+        ymax (-> rows first count dec)]
+    (cond-> []
+      (< 0    x) (conj [(dec x)      y])
+      (< x xmax) (conj [(inc x)      y])
+      (< 0    y) (conj [     x  (dec y)])
+      (< y ymax) (conj [     x  (inc y)]))))
 
-(defn adjacent [rows point]
-  (->> (for [coord (adjacent-coords point)] (get-in rows coord))
-       (remove nil?)))
-
-(defn adjacent-all [rows point]
-  (->> (adjacent-coords point)
-       (map (fn [p] [p (get-in rows p)]))
-       (remove #(nil? (second %)))))
-
-(defn low? [points]
-  (let [p (first points)
-        r (rest points)]
-    (every? #(< p %) r)))
+(defn low? [point neigbours]
+  (every? #(< point %) neigbours))
 
 (defn low-points [input]
-  (let [nrows (count input)
-        ncols (count (first input))]
-    (for [x (range nrows)
-          y (range ncols)
-          :when (low? (adjacent input [x y]))]
+  (let [nrows  (count input)
+        ncols  (count (first input))
+        height #(get-in input %)
+        near   #(neigbours % input)]
+    (for [x (range nrows) y (range ncols)
+          :when (low? (height [x y])
+                      (map height (near [x y])))]
       [x y])))
 
 (defn basin [position rows]
@@ -44,9 +40,9 @@
     (if-not (seq queue)
       basin
       (let [cur       (first queue)
-            adjacent  (rest (adjacent-all rows cur))
+            adjacent  (neigbours cur rows)
             more?     (< (get-in rows cur) 9)
-            to-queue  (if more? (remove basin (map first adjacent)) [])]
+            to-queue  (if more? (remove basin adjacent) [])]
         (recur
           (concat (rest queue) to-queue)
           (if more? (conj basin cur) basin))))))
