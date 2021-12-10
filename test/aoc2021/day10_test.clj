@@ -17,7 +17,3 @@
    (let [input (parse-input (slurp (io/resource "day10.txt")))]
      (is (= 358737 (solve-part1 input)))
      (is (= 4329504793 (solve-part2 input))))))
-
-
-
-

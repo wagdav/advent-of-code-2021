@@ -25,7 +25,7 @@
         #{\) \] \} \>} (if (= c (matching-closing (peek st)))
                            (pop st)
                            (reduced {:corrupted c}))))
-    []
+    '()
     chunk))
 
 (defn solve-part1 [input]
@@ -40,7 +40,7 @@
     (fn [total c]
       (+ (* 5 total) ({\) 1 \] 2 \} 3 \> 4} c)))
     0
-    (reverse completion)))
+    completion))
 
 (defn solve-part2 [input]
   (let [scores (->> input
@@ -48,6 +48,6 @@
                  (remove :corrupted)
                  (map #(map matching-closing %))
                  (map score)
-                 (sort))
+                 sort)
         midpoint (quot (dec (count scores)) 2)]
     (nth scores midpoint)))
