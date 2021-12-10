@@ -14,12 +14,7 @@
        (mapv #(mapv read-string %))))
 
 (defn adjacent-coords [[x y]]
-  (for [coord [[x y]
-               [x (dec y)]
-               [x (inc y)]
-               [(dec x) y]
-               [(inc x) y]]]
-   coord))
+  [[x y] [x (dec y)] [x (inc y)] [(dec x) y] [(inc x) y]])
 
 (defn adjacent [rows point]
   (->> (for [coord (adjacent-coords point)] (get-in rows coord))
@@ -45,17 +40,15 @@
 
 (defn basin [position rows]
   (loop [queue (vector position)
-         visited #{}
          basin #{}]
     (if-not (seq queue)
       basin
       (let [cur       (first queue)
             adjacent  (rest (adjacent-all rows cur))
             more?     (< (get-in rows cur) 9)
-            to-queue  (if more? (remove visited (map first adjacent)) [])]
+            to-queue  (if more? (remove basin (map first adjacent)) [])]
         (recur
           (concat (rest queue) to-queue)
-          (conj visited cur)
           (if more? (conj basin cur) basin))))))
 
 (defn solve-part1 [input]
