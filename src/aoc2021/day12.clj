@@ -11,11 +11,12 @@ b-end")
 
 (defn parse-input [input]
   (let [pairs (->> (str/split-lines input)
-               (map #(str/split % #"-")))]
+                   (map #(str/split % #"-")))]
     (reduce
       (fn [graph [a b]]
-        (assoc graph a (conj (get graph a []) b)
-                     b (conj (get graph b []) a)))
+        (-> graph
+            (update a conj b)
+            (update b conj a)))
       {}
       pairs)))
 
