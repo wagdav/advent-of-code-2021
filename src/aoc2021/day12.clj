@@ -29,7 +29,7 @@ b-end")
   "Given a cave map and the path return the path candidates to continue"
   [cave-map path]
   (into #{}
-        (map #(conj path %) (cave-map (last path)))))
+        (map #(conj path %) (cave-map (peek path)))))
 
 (defn paths [pred cave-map]
   (loop [to-check (candidates cave-map ["start"])
@@ -38,7 +38,7 @@ b-end")
       result
       (let [current   (first to-check)
             remaining (rest to-check)]
-        (if (= (last current) "end")
+        (if (= (peek current) "end")
           (recur remaining
                  (conj result current))
           (recur (into remaining (filter pred (candidates cave-map current)))
