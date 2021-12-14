@@ -31,7 +31,7 @@
       (reduce
         (fn [result [old amount new1 new2]]
           (-> result
-              ; Transform `amount` old pairs `o` into two new pairs `new1` and `new2`.
+              ; Transform `amount` number of `old` pairs into `new1` and `new2`.
               (update old sub amount)
               (update new1 add amount)
               (update new2 add amount)))
