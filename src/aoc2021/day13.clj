@@ -53,12 +53,11 @@ fold along x=5")
   (let [max-x (apply max (map first dots))
         max-y (apply max (map second dots))]
     (doseq [y (range (inc max-y))]
-      (do
-        (doseq [x (range (inc max-x))]
-          (if (dots [x y])
-            (print "#")
-            (print " ")))
-        (println)))))
+      (doseq [x (range (inc max-x))]
+        (if (dots [x y])
+          (print "#")
+          (print " ")))
+      (println))))
 
 (defn solve-part1 [{:keys [dots folds]}]
   (count (fold-paper dots [(first folds)])))
