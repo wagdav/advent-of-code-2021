@@ -12,5 +12,4 @@
   (testing "with real input"
     (let [input (parse-input (slurp (io/resource "day15.txt")))]
       (is (= 714 (solve-part1 input)))
-      (is (= 0 (solve-part2 input))))))
-
+      (is (= 2948 (solve-part2 input))))))

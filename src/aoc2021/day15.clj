@@ -1,5 +1,6 @@
 (ns aoc2021.day15
-  (:require [clojure.string :as str]))
+  (:require [clojure.string :as str]
+            [clojure.data.priority-map :refer [priority-map]]))
 
 (def example-input "1163751742
 1381373672
@@ -46,50 +47,27 @@
 (defn super-neigbours [{:keys [super-size]} [x y]]
   (neigbours [x y] super-size))
 
-(defn distance [p1 p2]
-  (let [dx (- (first p1) (first p2))
-        dy (- (second p1) (second p2))]
-   (Math/sqrt (+ (* dx dx) (* dy dy)))))
-
-(defn farther [p ps limit]
-  (every? #(< limit (distance p %)) ps))
-
 (defn least-risky-path [{:keys [super-size] :as grid}]
   (let [start [0 0]
         end [(dec super-size) (dec super-size)]]
-    (loop [current start
-           distances {current 0}
-           visited #{}
-           i 1]
-      (if-let [min-risk (visited end)]
-        (distances min-risk)
-        (let [tentative-distances (->> (super-neigbours grid current)
-                                       (map (fn [n]
-                                                [n (+ (distances current)
-                                                      (super-get grid n))]))
-                                       (into {}))
-              new-distances (reduce
-                              (fn [result [k v]]
-                                (assoc result k (min v (get result k v))))
-                             distances
-                             tentative-distances)
-              next-point (first (apply min-key second (remove (fn [[k _]] (visited k)) new-distances)))]
-          (recur next-point
-                 new-distances
-                 (conj visited current)
-                 (inc i)))))))
+    (loop [frontier (priority-map start 0)
+           explored #{}]
+      (let [[current distance] (peek frontier)]
+        (if (= current end)
+          distance
+          (recur
+            (reduce
+               (fn [queue [point tentative-distance]]
+                 (assoc queue point (min tentative-distance
+                                         (get queue point tentative-distance))))
 
-(comment
-  (def example (parse-input example-input))
+               (pop frontier)
 
-  (-> (super-grid example 2)
-      (super-neigbours [9 9]))
+               (->> (super-neigbours grid current)
+                    (map (fn [n] [n (+ distance (super-get grid n))]))
+                    (remove (fn [[n _]] (explored n)))))
 
-  (-> (super-grid example 5)
-      (super-get [0 0]))
-
-  (least-risky-path (super-grid example 1))
-  (least-risky-path (super-grid example 5)))
+            (conj explored current)))))))
 
 (defn solve-part1 [input]
   (least-risky-path (super-grid input)))
