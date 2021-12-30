@@ -1,6 +1,5 @@
 (ns aoc2021.day20
-  (:require [clojure.string :as str]
-            [aoc2021.utils :refer [irange]]))
+  (:require [clojure.string :as str]))
 
 (defn parse-image [text]
   (let [rows (str/split-lines text)
@@ -43,13 +42,13 @@
          (fn [state p]
            (assoc state p (get algorithm (index image p infinity))))
          {}
-         (for [x (irange (dec min-coord) (inc max-coord))
-               y (irange (dec min-coord) (inc max-coord))] [x y])))))
+         (for [x (range (dec min-coord) (+ 2 max-coord))
+               y (range (dec min-coord) (+ 2 max-coord))] [x y])))))
 
 (defn show [{:keys [image]}]
   (let [[min-coord max-coord] (coord-limits image)]
-    (doseq [x (irange min-coord max-coord)]
-     (doseq [y (irange min-coord max-coord)]
+    (doseq [x (range min-coord (inc max-coord))]
+     (doseq [y (range min-coord (inc max-coord))]
            (if-let [v (image [x y])]
              (print v)
              (print ".")))
