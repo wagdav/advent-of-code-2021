@@ -1,6 +1,5 @@
 (ns aoc2021.day23
-  (:require [clojure.string :as str]
-            [clojure.data.priority-map :refer [priority-map]]))
+  (:require [clojure.data.priority-map :refer [priority-map]]))
 
 (def example-input "#############
 #...........#
@@ -8,125 +7,47 @@
   #A#D#C#A#
   #########")
 
-(defn pad [n coll v]
-  (take n (concat coll (repeat v))))
-
 (defn parse-input [input]
-  (let [lines (str/split-lines input)
-        cols (count (first lines))]
-    (->>
-      lines
-      (mapv #(replace {\space \#} %))
-      (mapv #(pad cols % \#))
-      (map #(apply vector %)))))
+  (->>
+    (re-seq #"[A-D]" input)
+    (map first)
+    (partition 4)
+    (apply mapv vector)
+    (flatten)
+    (map-indexed (fn [i a] [:room [(-> i (quot 2) inc (* 2)) (-> i (mod 2) inc)] a]))))
 
 (def step-energy {\A 1 \B 10 \C 100 \D 1000})
 (def dst-room {\A 2 \B 4 \C 6 \D 8})
 
-(parse-input example-input)
+(defn room-capacity [input]
+  (case (count input)
+    8  2
+    16 4))
 
-;#..2.4.6.8..#
-;###B#C#B#D###
-;  #A#D#C#A#
-(def example-state
-  #{[:room [2 1] \B]
-    [:room [2 2] \A]
-    [:room [4 1] \C]
-    [:room [4 2] \D]
-    [:room [6 1] \B]
-    [:room [6 2] \C]
-    [:room [8 1] \D]
-    [:room [8 2] \A]})
+(defn goal [input]
+  (map (fn [[pos [room-number room-position] _]]
+         (vector pos [room-number room-position] ({2 \A 4 \B 6 \C 8 \D} room-number)))
+       input))
 
 ; Between the first and second lines of text that contain amphipod starting
 ; positions, insert the following lines:
 
 ;  #D#C#B#A#
 ;  #D#B#A#C#
+(def extra-input [[:room [2 3] \D]
+                  [:room [2 4] \D]
+                  [:room [4 3] \C]
+                  [:room [4 4] \B]
+                  [:room [6 3] \B]
+                  [:room [6 4] \A]
+                  [:room [8 3] \A]
+                  [:room [8 4] \C]])
 
-;###B#C#B#D###
-;  #D#C#B#A#
-;  #D#B#A#C#
-;  #A#D#C#A#
-(def example-state-part2
-  #{[:room [2 1] \B]
-    [:room [2 2] \D]
-    [:room [2 3] \D]
-    [:room [2 4] \A]
-
-    [:room [4 1] \C]
-    [:room [4 2] \C]
-    [:room [4 3] \B]
-    [:room [4 4] \D]
-
-    [:room [6 1] \B]
-    [:room [6 2] \B]
-    [:room [6 3] \A]
-    [:room [6 4] \C]
-
-    [:room [8 1] \D]
-    [:room [8 2] \A]
-    [:room [8 3] \C]
-    [:room [8 4] \A]})
-
-(def real-state
-  #{[:room [2 1] \C]
-    [:room [2 2] \D]
-    [:room [4 1] \A]
-    [:room [4 2] \C]
-    [:room [6 1] \B]
-    [:room [6 2] \A]
-    [:room [8 1] \D]
-    [:room [8 2] \B]})
-
-(def real-state-part2
-  #{[:room [2 1] \C]
-    [:room [2 2] \D]
-    [:room [2 3] \D]
-    [:room [2 4] \D]
-
-    [:room [4 1] \A]
-    [:room [4 2] \C]
-    [:room [4 3] \B]
-    [:room [4 4] \C]
-
-    [:room [6 1] \B]
-    [:room [6 2] \B]
-    [:room [6 3] \A]
-    [:room [6 4] \A]
-
-    [:room [8 1] \D]
-    [:room [8 2] \A]
-    [:room [8 3] \C]
-    [:room [8 4] \B]})
-
-(def goal
-  #{[:room [2 1] \A]
-    [:room [2 2] \A]
-    [:room [4 1] \B]
-    [:room [4 2] \B]
-    [:room [6 1] \C]
-    [:room [6 2] \C]
-    [:room [8 1] \D]
-    [:room [8 2] \D]})
-
-(def goal-part2
-  #{[:room [2 1] \A]
-    [:room [2 2] \A]
-    [:room [2 3] \A]
-    [:room [2 4] \A]
-    [:room [4 1] \B]
-    [:room [4 2] \B]
-    [:room [4 3] \B]
-    [:room [4 4] \B]
-    [:room [6 1] \C]
-    [:room [6 2] \C]
-    [:room [6 3] \C]
-    [:room [6 4] \C]
-    [:room [8 1] \D]
-    [:room [8 2] \D]
-    [:room [8 3] \D]
-    [:room [8 4] \D]})
+; For Part 2 insert the "forgotten" elements into the starting state
+(defn unfold [input]
+  (let [original (partition 2 input)
+        extra (partition 2 extra-input)]
+    (mapcat (fn [a b] (concat a b)) original extra)))
 
 (defn locations [state]
   (reduce
@@ -208,7 +129,7 @@
 
 (defn possible-steps [state]
   (let [{:keys [rooms hallway]} (locations state)
-        capacity 2]
+        capacity (room-capacity state)]
     (mapcat
       (fn [[pos coord amphipod]]
         (map #(conj [[pos coord amphipod]] %)
@@ -242,41 +163,31 @@
                                (cost from to)))))))
 
 (defn min-energy [start end]
-    (loop [frontier (priority-map start 0)
-           explored #{}
-           i 0]
-      (let [[current cost] (peek frontier)]
-        ;(println current cost)
-        (if (or (> i 500000) (= current end))
-          [cost i]
-          (recur
-            (reduce
-               (fn [queue [s tentative-cost]]
-                 (assoc queue s (min tentative-cost
-                                     (get queue s tentative-cost))))
+  (loop [frontier (priority-map start 0)
+         explored #{}]
+    (let [[current cost] (peek frontier)]
+      (if (= current end)
+        cost
+        (recur
+          (reduce
+             (fn [queue [s tentative-cost]]
+               (assoc queue s (min tentative-cost
+                                   (get queue s tentative-cost))))
 
-               (pop frontier)
+             (pop frontier)
 
-               (->> (tentative-states current)
-                    (map (fn [[s c]] [s (+ cost c)]))
-                    (remove (fn [[s _]] (explored s)))))
+             (->> (tentative-states current)
+                  (map (fn [[s c]] [s (+ cost c)]))
+                  (remove (fn [[s _]] (explored s)))))
 
-            (conj explored current)
+          (conj explored current))))))
 
-            (inc i))))))
+(defn solve-part1 [input]
+  (let [start (into #{} input)
+        end (into #{} (goal input))]
+    (min-energy start end)))
 
-(comment
-  (possible-steps example-state)
-
-  (blocked-in-room? [2 2] (:rooms (locations example-state)))
-  (tentative-states example-state)
-
-  (min-energy example-state goal)
-  (time (min-energy real-state goal))
-
-  ;Part2
-  (min-energy example-state-part2 goal-part2)
-  (time (min-energy real-state-part2 goal-part2)))
-
-(defn solve-part1 [])
-(defn solve-part2 [])
+(defn solve-part2 [input]
+  (let [start (into #{} (unfold input))
+        end (into #{} (goal start))]
+    (min-energy start end)))
