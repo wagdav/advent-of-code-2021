@@ -60,7 +60,7 @@ fold along x=5")
       (println))))
 
 (defn solve-part1 [{:keys [dots folds]}]
-  (count (fold-paper dots [(first folds)])))
+  (count (fold-paper dots (take 1 folds))))
 
 (defn solve-part2 [{:keys [dots folds]}]
   (show-code (fold-paper dots folds)))
