@@ -7,9 +7,7 @@
        (re-seq #"\d+")
        (map read-string)))
 
-(defn abs [n] (max n (- n)))
-
-(defn distance1 [x y] (abs (- x y)))
+(defn distance1 [x y] (Math/abs (- x y)))
 
 (defn distance2 [x y]
   (apply + (range 1 (inc (distance1 x y)))))

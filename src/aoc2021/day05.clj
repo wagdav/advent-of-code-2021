@@ -22,11 +22,9 @@
     (range a (inc b) 1)
     (range a (dec b) -1)))
 
-(defn abs [n] (max n (- n)))
-
 (defn diagonal? [[x1 y1 x2 y2]]
-  (= (rem (abs (- y1 y2))
-          (abs (- x1 x2)))
+  (= (rem (Math/abs (- y1 y2))
+          (Math/abs (- x1 x2)))
      0))
 
 (defn horizontal? [[x1 _ x2 _]]
