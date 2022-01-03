@@ -42,7 +42,7 @@ fold along x=5")
 (defn fold-paper [dots folds]
   (reduce
     (fn [paper [dir along]]
-      (into #{}
+      (set
         (case dir
           :along-x (map (fn [[x y]] [(fold along x) y]) paper)
           :along-y (map (fn [[x y]] [x (fold along y)]) paper))))

@@ -40,11 +40,8 @@
   "The board wins if it has at least one complete row or column of marked numbers"
  [board marked]
  (let [all-marked? (fn [nums] (every? (set marked) nums))]
-   (if (or
-         (some all-marked? board)
-         (some all-marked? (transpose board)))
-     board
-     nil)))
+   (when (or (some all-marked? board) (some all-marked? (transpose board)))
+     board)))
 
 (defn score
   "Sum of all the unmarked numbers multiplied by the last drawn number"

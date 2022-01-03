@@ -12,8 +12,7 @@ v.v..>>v.v
 ....v..v.>")
 
 (defn parse-input [input]
-  (->> (str/split-lines input)
-       (mapv #(apply vector %))))
+  (mapv #(apply vector %) (str/split-lines input)))
 
 (defn move-right [grid]
   (let [rows (count grid)

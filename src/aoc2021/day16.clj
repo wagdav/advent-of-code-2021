@@ -1,4 +1,5 @@
-(ns aoc2021.day16)
+(ns aoc2021.day16
+  (:require [clojure.string :as str]))
 
 (def hex-digits { \0 [0 0 0 0] \1 [0 0 0 1] \2 [0 0 1 0] \3 [0 0 1 1]
                   \4 [0 1 0 0] \5 [0 1 0 1] \6 [0 1 1 0] \7 [0 1 1 1]
@@ -15,8 +16,7 @@
                   7 :eq})
 
 (defn to-decimal [binary-seq]
-  (-> (apply str binary-seq)
-      (Long/parseLong 2)))
+  (Long/parseLong (str/join binary-seq) 2))
 
 (defn version [{:keys [input] :as state}]
   (assoc state
@@ -33,7 +33,7 @@
     (loop [in input
            result []
            processed 0]
-      (if (= 0 (first in))
+      (if (zero? (first in))
         (let [value (into result (take 4 (rest in)))
               packet-size (* 5 (inc processed))]
           {:value (to-decimal value)
@@ -73,7 +73,7 @@
             (loop [stream remaining
                    result []
                    n (to-decimal num-subpackets)]
-              (if (= n 0)
+              (if (zero? n)
                 {:operands result
                  :input stream
                  :length-type 1}
@@ -89,11 +89,11 @@
 (defn parse-binary-packet [binary]
   (let [p (-> {:input binary} version id)
         id (p :id)]
-    (->
+    (assoc
       (if (= id 4)
         (literal p)
         (operator p))
-      (assoc :type (packet-type id)))))
+      :type (packet-type id))))
 
 (defn parse-input [input]
      (->> input

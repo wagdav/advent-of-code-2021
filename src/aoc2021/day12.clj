@@ -10,8 +10,7 @@ A-end
 b-end")
 
 (defn parse-input [input]
-  (let [pairs (->> (str/split-lines input)
-                   (map #(str/split % #"-")))]
+  (let [pairs (map #(str/split % #"-") (str/split-lines input))]
     (reduce
       (fn [graph [a b]]
         (-> graph
@@ -28,8 +27,7 @@ b-end")
 (defn candidates
   "Given a cave map and the path return the path candidates to continue"
   [cave-map path]
-  (into #{}
-        (map #(conj path %) (cave-map (peek path)))))
+  (set (map #(conj path %) (cave-map (peek path)))))
 
 (defn paths [pred cave-map]
   (loop [to-check (candidates cave-map ["start"])

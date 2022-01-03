@@ -7,11 +7,10 @@
           (->> (re-seq #"-?\d+" coord-range)
                (map #(Integer/parseInt %))
                (partition 2)
-               (map #(into [] %))))))
+               (map vec)))))
 
 (defn parse-input [input]
-  (->> (str/split-lines input)
-       (mapv parse-line)))
+  (mapv parse-line (str/split-lines input)))
 
 (defn initialize [instructions]
   (reduce
@@ -65,5 +64,4 @@
   (count (initialize input)))
 
 (defn solve-part2 [input]
-  (->> (reboot input)
-       total-volume))
+  (total-volume (reboot input)))

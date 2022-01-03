@@ -21,9 +21,9 @@
 (defn neigbours [[x y] size]
   (let [imax (dec size)]
     (cond-> []
-      (< 0    x) (conj [(dec x)      y])
+      (pos?   x) (conj [(dec x)      y])
       (< x imax) (conj [(inc x)      y])
-      (< 0    y) (conj [     x  (dec y)])
+      (pos?   y) (conj [     x  (dec y)])
       (< y imax) (conj [     x  (inc y)]))))
 
 (defn super-grid

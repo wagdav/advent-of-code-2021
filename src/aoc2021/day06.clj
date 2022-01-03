@@ -10,20 +10,19 @@
 (defn solve-part1 [input]
    (loop [f input
           t 80]
-     (if (= t 0)
+     (if (zero? t)
        (count f)
-       (recur (mapcat (fn [f] (if (= 0 f) [6 8] [(dec f)])) f)
+       (recur (mapcat (fn [f] (if (zero? f) [6 8] [(dec f)])) f)
               (dec t)))))
 
 (defn fish [n input]
    (loop [fish (frequencies input)
           t    n]
-     (if (= t 0)
+     (if (zero? t)
         (apply + (vals fish))
-        (recur (-> (into {} (for [i (range 9)]
-                                 [i
-                                  (get fish (mod (inc i) 9) 0)]))
-                   (update 6 + (get fish 0 0)))
+        (recur (update
+                  (into {} (for [i (range 9)] [i (get fish (mod (inc i) 9) 0)]))
+                  6 + (get fish 0 0))
                (dec t)))))
 
 (defn solve-part2 [input]
@@ -34,16 +33,18 @@
 
   ; The laternfish evolution rule as a lazy sequence.
   (defn fish-lazy-seq [st]
-    (let [new-st (-> (into {} (for [i (range 9)] [i (get st (mod (inc i) 9) 0)]))
-                     (update 6 + (get st 0 0)))]
+    (let [new-st (update
+                   (into {} (for [i (range 9)] [i (get st (mod (inc i) 9) 0)]))
+                   6 + (get st 0 0))]
       (lazy-seq (cons st (fish-lazy-seq new-st)))))
 
   ; Same as `fish-lazy-seq`, using `iterate`.  Seems clearer.
   (defn fish-iterate [state]
     (iterate
       (fn [st]
-       (-> (into {} (for [i (range 9)] [i (get st (mod (inc i) 9) 0)]))
-           (update 6 + (get st 0 0))))
+       (update
+         (into {} (for [i (range 9)] [i (get st (mod (inc i) 9) 0)]))
+         6 + (get st 0 0)))
       state))
 
   ; The final aggregation function.
@@ -61,5 +62,4 @@
 
   ; Solution of the puzzle: "How many lanterfish would there be after 256
   ; days?"
-  (-> (nth (fish-iterate input) 256)
-      fish-count))
+  (fish-count (nth (fish-iterate input) 256)))

@@ -47,7 +47,7 @@
 (defn unfold [input]
   (let [original (partition 2 input)
         extra (partition 2 extra-input)]
-    (mapcat (fn [a b] (concat a b)) original extra)))
+    (mapcat concat original extra)))
 
 (defn locations [state]
   (reduce
@@ -69,7 +69,7 @@
 
 (defn to-hallway-left [number hallway]
   (loop [dst (dec number) steps #{}]
-    (if (or (< dst 0) (contains? hallway dst))
+    (if (or (neg? dst) (contains? hallway dst))
       steps
       (recur (dec dst) (conj steps [:hallway dst])))))
 
@@ -121,11 +121,10 @@
   (if (or (in-dst-room? [number position] rooms amphipod capacity)
           (blocked-in-room? [number position] rooms))
     #{}
-    (->>
+    (set
       (concat
         (room-to-hallway number rooms hallway amphipod)
-        (to-destination number rooms hallway amphipod capacity))
-      (into #{}))))
+        (to-destination number rooms hallway amphipod capacity)))))
 
 (defn possible-steps [state]
   (let [{:keys [rooms hallway]} (locations state)
@@ -157,10 +156,11 @@
       (* (step-energy amphipod) (+ p1 p2 (Math/abs (- n1 n2)))))))
 
 (defn tentative-states [state]
-  (->> (possible-steps state)
-       (map (fn ([[from to]] (vector
-                               (into #{} (replace {from to} state))
-                               (cost from to)))))))
+  (map
+    (fn ([[from to]] (vector
+                       (set (replace {from to} state))
+                       (cost from to))))
+    (possible-steps state)))
 
 (defn min-energy [start end]
   (loop [frontier (priority-map start 0)
@@ -183,11 +183,11 @@
           (conj explored current))))))
 
 (defn solve-part1 [input]
-  (let [start (into #{} input)
-        end (into #{} (goal input))]
+  (let [start (set input)
+        end (set (goal input))]
     (min-energy start end)))
 
 (defn solve-part2 [input]
-  (let [start (into #{} (unfold input))
-        end (into #{} (goal start))]
+  (let [start (set (unfold input))
+        end (set (goal start))]
     (min-energy start end)))

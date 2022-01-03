@@ -1,4 +1,5 @@
-(ns aoc2021.day14)
+(ns aoc2021.day14
+  (:require [clojure.string :as str]))
 
 (defn parse-input [input]
   (let [words (re-seq #"\w+" input)]
@@ -10,7 +11,7 @@
     (fn [t]
       (str
         (->> (partition 2 1 t)
-             (map #(apply str %))
+             (map str/join)
              (map rules)
              (interleave t)
              (apply str))
@@ -21,7 +22,7 @@
 (def sub (fnil - 0))
 
 (defn produce-pairs [pair rules]
-  (let [middle (first (rules (apply str pair)))]
+  (let [middle (first (rules (str/join pair)))]
     [(list (first pair) middle)
      (list middle (second pair))]))
 
@@ -37,8 +38,7 @@
               (update new2 add amount)))
         freqs
         (map (fn [[pair amount]] (into [pair amount] (produce-pairs pair rules))) freqs)))
-    (->> (partition 2 1 template)
-         frequencies)))
+    (frequencies (partition 2 1 template))))
 
 (defn pair-frequencies [initial m]
   (-> (reduce

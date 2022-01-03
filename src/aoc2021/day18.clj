@@ -13,8 +13,7 @@
 [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]")
 
 (defn parse-input [input]
-  (->> (str/split-lines input)
-       (map read-string)))
+  (map read-string (str/split-lines input)))
 
 (defn index-tree
   ([node]

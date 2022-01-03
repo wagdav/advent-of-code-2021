@@ -64,9 +64,10 @@
 
      {:grid input :flashed flashed}
 
-     (->> (each-point-coords input)
-          (filter #(and (< 9 (get-in input %))
-                        (nil? (flashed %)))))))
+     (filter
+       #(and (< 9 (get-in input %))
+             (nil? (flashed %)))
+       (each-point-coords input))))
 
   ([input _ [x y]]
    (let [size (count input)]

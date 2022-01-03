@@ -32,7 +32,7 @@
     (partition 6 (deterministic-die))))
 
 (def dirac-roll
-  (into [] (for [a [1 2 3] b [1 2 3] c [1 2 3]] [a b c])))
+  (vec (for [a [1 2 3] b [1 2 3] c [1 2 3]] [a b c])))
 
 (defn next-turn [t]
   (-> t inc (mod 2)))
@@ -54,4 +54,4 @@
                 (recur (mapv + wins' wins) (pop rolls))))))))))
 
 (defn solve-part2 [input]
-  (apply max (count-games (into [] input) [0 0] 0)))
+  (apply max (count-games (vec input) [0 0] 0)))

@@ -23,9 +23,7 @@
     (range a (dec b) -1)))
 
 (defn diagonal? [[x1 y1 x2 y2]]
-  (= (rem (Math/abs (- y1 y2))
-          (Math/abs (- x1 x2)))
-     0))
+  (zero? (rem (Math/abs (- y1 y2)) (Math/abs (- x1 x2)))))
 
 (defn horizontal? [[x1 _ x2 _]]
   (= x1 x2))

@@ -1,8 +1,9 @@
 (ns aoc2021.day17)
 
 (defn parse-input [input]
-  (->> (re-seq #"-?\d+" input)
-       (map #(Integer/parseInt %))))
+  (map
+    #(Integer/parseInt %)
+    (re-seq #"-?\d+" input)))
 
 (def example-input "target area: x=20..30, y=-10..-5")
 
@@ -54,5 +55,4 @@
        (apply max)))
 
 (defn solve-part2 [target]
-  (->> (scan-vy target)
-       (count)))
+  (count (scan-vy target)))
