@@ -54,7 +54,7 @@
 (defn apply-mask [vs mask]
   (map first
     (filter (fn [[_ b]] (true? b))
-      (map (fn [a b] [a b]) vs mask))))
+      (map vector vs mask))))
 
 (defn rating [f]
   (fn [cols]
