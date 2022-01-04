@@ -15,16 +15,14 @@
 (defn initialize [instructions]
   (reduce
     (fn [state [cmd [x1 x2] [y1 y2] [z1 z2]]]
-      (case cmd
-        :on
-        (reduce conj state (for [x (range (max -50 x1) (inc (min 50 x2)))
-                                 y (range (max -50 y1) (inc (min 50 y2)))
-                                 z (range (max -50 z1) (inc (min 50 z2)))] [x y z]))
-
-        :off
-        (reduce disj state (for [x (range (max -50 x1) (inc (min 50 x2)))
-                                 y (range (max -50 y1) (inc (min 50 y2)))
-                                 z (range (max -50 z1) (inc (min 50 z2)))] [x y z]))))
+      (reduce
+        (case cmd
+          :on  conj
+          :off disj)
+        state
+        (for [x (range (max -50 x1) (inc (min 50 x2)))
+              y (range (max -50 y1) (inc (min 50 y2)))
+              z (range (max -50 z1) (inc (min 50 z2)))] [x y z])))
     #{}
     instructions))
 
