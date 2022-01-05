@@ -36,12 +36,16 @@
 (defn transpose [m]
   (apply mapv vector m))
 
+(defn complete-with? [marked]
+  (fn [numbers]
+    (every? (set marked) numbers)))
+
 (defn wins?
   "The board wins if it has at least one complete row or column of marked numbers"
- [board marked]
- (let [all-marked? (fn [nums] (every? (set marked) nums))]
-   (when (or (some all-marked? board) (some all-marked? (transpose board)))
-     board)))
+  [board marked]
+  (when (or (some (complete-with? marked) board)
+            (some (complete-with? marked) (transpose board)))
+    board))
 
 (defn score
   "Sum of all the unmarked numbers multiplied by the last drawn number"
