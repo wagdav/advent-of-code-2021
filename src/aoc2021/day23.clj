@@ -177,8 +177,8 @@
              (pop frontier)
 
              (->> (tentative-states current)
-                  (map (fn [[s c]] [s (+ cost c)]))
-                  (remove (fn [[s _]] (explored s)))))
+                  (remove explored)
+                  (map (fn [[s c]] [s (+ cost c)]))))
 
           (conj explored current))))))
 

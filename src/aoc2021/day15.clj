@@ -64,8 +64,8 @@
                (pop frontier)
 
                (->> (super-neigbours grid current)
-                    (map (fn [n] [n (+ distance (super-get grid n))]))
-                    (remove (fn [[n _]] (explored n)))))
+                    (remove explored)
+                    (map #(vector % (+ distance (super-get grid %))))))
 
             (conj explored current)))))))
 
