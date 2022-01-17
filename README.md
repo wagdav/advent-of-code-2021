@@ -13,11 +13,15 @@ nix build
 
 Run all tests:
 ```
-nix develop --command clj -X:test
+nix shell nixpkgs#clojure --command clj -X:test
 ```
 
 Run linting:
 
 ```
-nix develop --command clj-kondo --lint .
+nix shell nixpkgs#clj-kondo --command clj-kondo --lint .
+```
+
+```
+nix shell nixpkgs#clojure --command clj -M:test:eastwood
 ```

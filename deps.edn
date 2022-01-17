@@ -9,4 +9,7 @@
                   :exec-fn cognitect.test-runner.api/test}
 
            :kibit {:extra-deps {tvaughan/kibit-runner {:mvn/version "0.1.0"}}
-                   :main-opts ["-m" "kibit-runner.cmdline"]}}}
+                   :main-opts ["-m" "kibit-runner.cmdline"]}
+
+           :eastwood {:main-opts ["-m" "eastwood.lint" {}]
+                      :extra-deps {jonase/eastwood {:mvn/version "RELEASE"}}}}}
