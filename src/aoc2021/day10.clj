@@ -13,7 +13,7 @@
 <{([{{}}[<[[[<>{}]]]>[]]")
 
 (defn parse-input [input]
-  (->> (str/split-lines input)))
+  (str/split-lines input))
 
 (def matching-closing {\( \) \[ \] \{ \} \< \>})
 

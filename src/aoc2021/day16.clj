@@ -37,7 +37,7 @@
         (let [value (into result (take 4 (rest in)))
               packet-size (* 5 (inc processed))]
           {:value (to-decimal value)
-           :input (drop (+ packet-size) input)})
+           :input (drop packet-size input)})
         (recur
           (drop 5 in)
           (into result (take 4 (rest in)))
