@@ -89,7 +89,7 @@
 
 (defn manhattan [p1 p2]
   (->> (map - p1 p2)
-       (map #(Math/abs %))
+       (map #(Math/abs ^long %))
        (apply +)))
 
 (defn solve-part1 [input]

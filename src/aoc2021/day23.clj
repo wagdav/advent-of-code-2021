@@ -140,19 +140,19 @@
             (to-destination coord rooms hallway amphipod capacity))))
       state)))
 
-(defn cost [[pos1 coord1 amphipod] [pos2 coord2 _]]
+(defn cost [[pos1 ^long coord1 amphipod] [pos2 ^long coord2 _]]
   (case [pos1 pos2]
     [:room :hallway]
-    (let [[n1 p1] coord1]
+    (let [[^long n1 p1] coord1]
       (* (step-energy amphipod) (+ p1 (Math/abs (- n1 coord2)))))
 
     [:hallway :room]
-    (let [[n2 p2] coord2]
+    (let [[^long n2 p2] coord2]
       (* (step-energy amphipod) (+ p2 (Math/abs (- n2 coord1)))))
 
     [:room :room]
-    (let [[n1 p1] coord1
-          [n2 p2] coord2]
+    (let [[^long n1 p1] coord1
+          [^long n2 p2] coord2]
       (* (step-energy amphipod) (+ p1 p2 (Math/abs (- n1 n2)))))))
 
 (defn tentative-states [state]

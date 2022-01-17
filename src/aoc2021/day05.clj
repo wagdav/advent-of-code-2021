@@ -22,7 +22,7 @@
     (range a (inc b) 1)
     (range a (dec b) -1)))
 
-(defn diagonal? [[x1 y1 x2 y2]]
+(defn diagonal? [[^long x1 ^long y1 ^long x2 ^long y2]]
   (zero? (rem (Math/abs (- y1 y2)) (Math/abs (- x1 x2)))))
 
 (defn horizontal? [[x1 _ x2 _]]
