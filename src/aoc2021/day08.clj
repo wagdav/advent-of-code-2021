@@ -49,26 +49,24 @@ gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce
 (defn decode [patterns]
   (let [group  (group-by count patterns)
         ; Unambiguous digits
-        one    (first (get group 2))
-        four   (first (get group 4))
-        seven  (first (get group 3))
-        eight  (first (get group 7))
+        [one]   (get group 2)
+        [four]  (get group 4)
+        [seven] (get group 3)
+        [eight] (get group 7)
         ; Candiates for 2,3,5 and 0,6,9
-        c235   (get group 5)
-        c069   (get group 6)
+        c235    (get group 5)
+        c069    (get group 6)
         ; Find the rest by exploiting their similarities in shape
-        three  (find-with-mask one c235)
-        nine   (find-with-mask three c069)
-        zero   (->> c069
-                    (remove #{nine})
-                    (find-with-mask seven))
-        six    (->> c069
-                    (remove #{zero nine})
-                    first)
-        five   (->> c235
-                    (remove #{three})
-                    (find-with-mask nine nine))
-        two    (first (remove #{three five} c235))]
+        three   (find-with-mask one c235)
+        nine    (find-with-mask three c069)
+        zero    (->> c069
+                     (remove #{nine})
+                     (find-with-mask seven))
+        five    (->> c235
+                     (remove #{three})
+                     (find-with-mask nine nine))
+        [six]   (remove #{zero nine} c069)
+        [two]   (remove #{three five} c235)]
     {zero 0 one 1 two 2 three 3 four 4 five 5 six 6 seven 7 eight 8 nine 9}))
 
 (defn decode-line [[patterns output]]
