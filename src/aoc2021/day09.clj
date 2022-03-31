@@ -12,7 +12,7 @@
        (mapv #(re-seq #"\w" %))
        (mapv #(mapv read-string %))))
 
-(defn neigbours [[x y] rows]
+(defn neigbours [rows [x y]]
   (let [xmax (-> rows count dec)
         ymax (-> rows first count dec)]
     (cond-> []
@@ -27,8 +27,8 @@
 (defn low-points [input]
   (let [nrows  (count input)
         ncols  (count (first input))
-        height #(get-in input %)
-        near   #(neigbours % input)]
+        height (partial get-in input)
+        near   (partial neigbours input)]
     (for [x (range nrows) y (range ncols)
           :when (low? (height [x y])
                       (map height (near [x y])))]
