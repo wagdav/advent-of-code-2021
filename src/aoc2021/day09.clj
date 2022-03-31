@@ -35,16 +35,16 @@
       [x y])))
 
 (defn basin [position rows]
-  (loop [queue (vector position)
+  (loop [queue (conj clojure.lang.PersistentQueue/EMPTY position)
          basin #{}]
-    (if-not (seq queue)
+    (if (empty? queue)
       basin
-      (let [cur       (first queue)
-            adjacent  (neigbours cur rows)
+      (let [cur       (peek queue)
+            adjacent  (neigbours rows cur)
             more?     (< (get-in rows cur) 9)
             to-queue  (if more? (remove basin adjacent) [])]
         (recur
-          (concat (rest queue) to-queue)
+          (into (pop queue) to-queue)
           (if more? (conj basin cur) basin))))))
 
 (defn solve-part1 [input]
